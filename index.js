@@ -1,10 +1,29 @@
 import express from "express";
 import cors from "cors";
-import { Socket } from "socket.io";
+import { Server } from "socket.io";
 import http from "http";
 const app = express();
 
 //configure app
-app.use(express.json());
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "PATCH"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("connected ID: " + socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("disconnected");
+  });
+});
+
+server.listen(5000, () => {
+  console.log("server Started  ");
+});
